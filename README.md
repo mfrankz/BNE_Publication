@@ -108,3 +108,5 @@ plot_ordination(ps, ord.pcoa, color="Group", shape="Group")+
 ggsave("Beta.png", width = 28, height = 20, units = "cm")
 ```
 <img src="https://github.com/mfrankz/BNE_Publication/blob/main/Beta.png" width="600">
+
+
