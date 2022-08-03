@@ -34,7 +34,7 @@ my_theme<-theme(
   legend.key.width = unit(1, "cm"))
   ```
   
-2. We will now inspect alpha diversity, a measure of within-sample richness/abundance. 
+2. We will now inspect alpha diversity, a measure of within-sample richness/abundance. Alpha diversity was calculated using the Shannon Index.
 ```
 #extract alpha diversity values into a dataframe
 library(plotrix)
@@ -88,3 +88,23 @@ LMERalpha<-lmer(scale(alpha_diversity)~Injury*Diet*Time +
                 scale(Baseline) +(1|ID), 
                 data=alpha)
 summary(LMERalpha) #note that there are many methods for significance testing with mixed models
+```
+
+2. We will now inspect beta diversity, a measure of dissimilarity between samples. Beta diversity was calculated using Weighted Unifrac Distance and reduced using PCoA for data visualization.
+```
+#plot beta diversity
+ps.prop <- transform_sample_counts(ps, function(otu) otu/sum(otu))
+ord.pcoa = ordinate(ps.prop, "PCoA", "unifrac", weighted=TRUE)
+plot_ordination(ps, ord.pcoa, color="Group", shape="Group")+
+  facet_wrap(~Time)+
+  geom_point(aes(fill=Group), color="black",size=6)+
+  scale_fill_manual(values = c("#8BC589", "#2DA05A", "#32648C", "#234664"))+
+  scale_color_manual(values = c("#8BC589", "#2DA05A", "#32648C", "#234664"))+
+  scale_shape_manual(values=c(24, 21, 24, 21))+
+  ggtitle("PCoA on Weighted-UniFrac Distance")+
+  xlim(-0.52,0.52)+
+  stat_ellipse(type = "norm", linetype = 2, size=1.5)+
+  my_theme
+ggsave("Beta.png", width = 28, height = 20, units = "cm")
+```
+<img src="https://github.com/mfrankz/BNE_Publication/blob/main/Beta.png" width="600">
