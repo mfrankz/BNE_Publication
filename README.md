@@ -65,3 +65,26 @@ ggplot(data=alpha_plot, aes(x=Time, y= alpha_diversity, color=Group, group=Group
 ggsave("Alpha.png", width = 28, height = 20, units = "cm")
 ```
 <img src="https://github.com/mfrankz/BNE_Publication/blob/main/Alpha.png" width="600">
+
+```
+#analyze alpha diversity using linear mixed-effects regression
+
+#Create baseline variable 
+temp<-aggregate(cbind(alpha_diversity)~ID, data=subset(alpha_df, Time == "Pre"), mean)
+colnames(temp)[colnames(temp)=="alpha_diversity"] <- "Baseline"
+alpha_df<-merge(alpha_df,temp, by=c("ID"), all=T)
+
+#perform analysis
+library(lme4)
+library(lmerTest)
+alpha_df$Diet<-as.factor(alpha_df$Diet)
+alpha_df$Injury<-as.factor(alpha_df$Injury)
+alpha_df$Time<-as.factor(alpha_df$Time)
+alpha_df$ID<-as.factor(alpha_df$ID)
+alpha_df$Diet<-relevel(alpha_df$Diet, ref="LFD")
+alpha<-subset(alpha_df, alpha_df$Time != "Pre")
+alpha$Time<-droplevels(alpha$Time)
+LMERalpha<-lmer(scale(alpha_diversity)~Injury*Diet*Time + 
+                scale(Baseline) +(1|ID), 
+                data=alpha)
+summary(LMERalpha) #note that there are many methods for significance testing with mixed models
