@@ -64,3 +64,4 @@ ggplot(data=alpha_plot, aes(x=Time, y= alpha_diversity, color=Group, group=Group
   my_theme
 ggsave("Alpha.png", width = 28, height = 20, units = "cm")
 ```
+<img src="https://github.com/mfrankz/RGT-PoBS/blob/main/correlation.png" width="600">
