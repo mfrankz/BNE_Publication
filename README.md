@@ -193,3 +193,43 @@ ggplot(phy_SHAM, aes(x = Time, y = Abundance, fill = Phylum)) +
 ggsave("SHAM_phylum.png", width = 34, height = 20, units = "cm")
 ```
 <img src="https://github.com/mfrankz/BNE_Publication/blob/main/SHAM_phylum.png" width="600">
+
+```
+#plot phyla at the aggregate level
+library(tidyr)
+phy_avg <- aggregate(phy_df[,"Abundance"],
+                     by = list(phy_df[,"Time"], 
+                               phy_df[,"Injury"], 
+                               phy_df[,"Diet"],
+                               phy_df[,"Phylum"]),
+                     FUN = function(x) mean = mean(x))
+phy_avg <- do.call(data.frame, phy_avg)
+colnames(phy_avg) <- c("Time", "Injury", "Diet", "Phylum", "Abundance")
+phy_avg$Group <- paste(phy_avg$Diet, phy_avg$Injury)
+library(plotrix)
+StdEr<-aggregate(Abundance ~ ID + Diet + Injury + Time + Phylum, phy_df, mean)
+StdEr<-aggregate(Abundance ~ Diet + Injury + Time + Phylum, StdEr, std.error)
+colnames(StdEr)[colnames(StdEr)=="Abundance"] <- "Phy.Error"
+phy_avg<-merge(phy_avg, StdEr, by=c("Diet", "Injury", "Time", "Phylum"), all=T)
+
+#filter to taxa with greater than 1% abundance
+phy_avg<-subset(phy_avg, Phylum=="Firmicutes"|
+                  Phylum=="Bacteroidetes"|
+                  Phylum=="Proteobacteria")
+
+#plot
+ggplot(data=phy_avg,aes(Time, Abundance, color=Group, group=Group, shape=Group))+ 
+  geom_errorbar(aes(ymin=Abundance, ymax=Abundance+Phy.Error), width=.2, size=1.5)+
+  geom_line(size=1.5)+
+  geom_point(aes(fill=Group), color="black", size=6, stroke=1)+
+  facet_wrap(~Phylum)+
+  scale_fill_manual(values = c("#8BC589", "#2DA05A", "#32648C", "#234664"))+
+  scale_color_manual(values = c("#8BC589", "#2DA05A", "#32648C", "#234664"))+
+  scale_shape_manual(values=c(24, 21, 24, 21))+
+  xlab("Days Post-Injury")+
+  ylab("Relative Abundance")+
+  my_theme+
+  theme(axis.text.x = element_text(size=20,angle = -40,hjust=0.5, vjust=0))
+ggsave("phylum.png", width = 34, height = 20, units = "cm")
+```
+<img src="https://github.com/mfrankz/BNE_Publication/blob/main/phylum.png" width="600">
