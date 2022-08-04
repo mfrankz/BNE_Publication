@@ -88,6 +88,16 @@ LMERalpha<-lmer(scale(alpha_diversity)~Injury*Diet*Time +
                 scale(Baseline) +(1|ID), 
                 data=alpha)
 summary(LMERalpha) #note that there are many methods for significance testing with mixed models
+
+#note: post-publication, we found that adding baseline alpha diversity causes overfitting. Below, is a modified analysis to account for this:
+#significance via model comparison without the baseline variable
+m1<-lmer(scale(alpha_diversity)~Time +(1|ID), 
+                data=subset(alpha_df,alpha_df$Time != "Pre"))
+m2<-lmer(scale(alpha_diversity)~Time+Diet +(1|ID), 
+         data=subset(alpha_df,alpha_df$Time != "Pre"))
+m3<-lmer(scale(alpha_diversity)~Time+Diet+Injury +(1|ID), 
+         data=subset(alpha_df,alpha_df$Time != "Pre"))
+anova(m1, m2, m3)
 ```
 
 2. We will now inspect beta diversity, a measure of dissimilarity between samples. Beta diversity was calculated using Weighted Unifrac Distance and reduced using PCoA for data visualization.
@@ -109,4 +119,37 @@ ggsave("Beta.png", width = 28, height = 20, units = "cm")
 ```
 <img src="https://github.com/mfrankz/BNE_Publication/blob/main/Beta.png" width="600">
 
+```
+#Analyze beta diversity using PERMANOVA
+#isolate beta diversity scores in dataframe
+library(reshape2)
+beta = phyloseq::distance(ps, "wunifrac") #option for weighted UniFrac values 
+beta_df = melt(as.matrix(beta))
 
+#format data for PERMANOVA
+beta_df <- reshape(beta_df, 
+                   timevar = "Var2",
+                   idvar = c("Var1"),
+                   direction = "wide")
+names(beta_df)[names(beta_df) == "Var1"] <- "SampleID"
+temp<-as.data.frame(sample_data(ps))
+temp$SampleID<-as.factor(temp$SampleID)
+beta_df<-cbind(beta_df, temp) 
+beta_df<-subset(beta_df, select = -c(1))
+
+#create baseline variable
+beta_df$Avg <- (rowSums(beta_df[,1:96]))/96
+temp<-aggregate(Avg~ID, data=subset(beta_df, Time == "Pre"), mean)
+colnames(temp)[colnames(temp)=="Avg"] <- "Baseline"
+beta_df<-merge(beta_df,temp, by=c("ID"), all=T)
+
+#prep data for analysis
+beta_df<-subset(beta_df, Time!="Pre")
+beta_df$Time<-droplevels(beta_df$Time)
+IVs <- subset(beta_df, select = c("SampleID", "ID", "Time", "Injury", "Group", "Diet"))
+DVs <- subset(beta_df, select = -c(SampleID, ID, Time, Injury, Group, Diet))
+set.seed(50)
+permanova <- vegan::adonis2(DVs ~ Injury*Diet*Time, data=IVs, permutations=999)
+permanova
+#note: permanova draws random permutations from the data. Here, we have set a random seed for reproducibility. The seed was not set for the manuscript analyses, so your results might look slightly different
+```
