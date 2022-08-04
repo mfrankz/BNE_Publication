@@ -191,4 +191,4 @@ ggplot(phy_SHAM, aes(x = Time, y = Abundance, fill = Phylum)) +
   theme(axis.text.x=element_text(size=14))
 ggsave("SHAM_phylum.png", width = 34, height = 20, units = "cm")
 ```
-<img src="https://github.com/mfrankz/BNE_Publication/blob/main/Sham_phylum.png" width="600">
+<img src="https://github.com/mfrankz/BNE_Publication/blob/main/SHAM_phylum.png" width="600">
