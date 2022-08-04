@@ -178,6 +178,7 @@ ggplot(phy_TBI, aes(x = Time, y = Abundance, fill = Phylum)) +
 ggsave("TBI_phylum.png", width = 34, height = 20, units = "cm")
 ```
 <img src="https://github.com/mfrankz/BNE_Publication/blob/main/TBI_phylum.png" width="600">
+
 ```
 #visualize sham subjects
 phy_SHAM<- subset(phy_df, phy_df$Injury == "Sham")
