@@ -153,3 +153,42 @@ permanova <- vegan::adonis2(DVs ~ Injury*Diet*Time, data=IVs, permutations=999)
 permanova
 #note: permanova draws random permutations from the data. Here, we have set a random seed for reproducibility. The seed was not set for the manuscript analyses, so your results might look slightly different
 ```
+
+3. We will now inspect the abundance of specific taxa at the phylum level. 
+```
+#isolate phylum level data
+filt <- genefilter_sample(ps, filterfun_sample(function(x) x > 3))
+ps1 <- prune_taxa(filt, ps)
+ps1 <- transform_sample_counts(ps1, function(x) x/sum(x))
+phy <- tax_glom(ps1, taxrank="Phylum") #note: can change taxrank to family, genus, etc.
+phy <- prune_taxa(taxa_sums(phy)>=0.01, phy)
+phy_df <- psmelt(phy)
+```
+```
+#visualize TBI subject
+phy_TBI<- subset(phy_df, phy_df$Injury == "TBI")
+ggplot(phy_TBI, aes(x = Time, y = Abundance, fill = Phylum)) +
+  geom_bar(stat = "identity", position = "stack", color = "black") +
+  theme(axis.text.x = element_text(angle = -90, hjust = 0))+ 
+  facet_wrap(~ID)+  	
+  ggtitle("TBI Subjects") +
+  xlab("Days Post-Injury")+
+  my_theme+
+  theme(axis.text.x=element_text(size=14))
+ggsave("TBI_phylum.png", width = 34, height = 20, units = "cm")
+```
+<img src="https://github.com/mfrankz/BNE_Publication/blob/main/TBI_phylum.png" width="600">
+```
+#visualize sham subjects
+phy_SHAM<- subset(phy_df, phy_df$Injury == "Sham")
+ggplot(phy_SHAM, aes(x = Time, y = Abundance, fill = Phylum)) +
+  geom_bar(stat = "identity", position = "stack", color = "black") +
+  theme(axis.text.x = element_text(angle = -90, hjust = 0))+ 
+  facet_wrap(~ID)+  	
+  ggtitle("Sham Subjects") +
+  xlab("Days Post-Injury")+
+  my_theme+
+  theme(axis.text.x=element_text(size=14))
+ggsave("SHAM_phylum.png", width = 34, height = 20, units = "cm")
+```
+<img src="https://github.com/mfrankz/BNE_Publication/blob/main/Sham_phylum.png" width="600">
