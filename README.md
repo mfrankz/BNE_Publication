@@ -3,7 +3,7 @@
 
 ## This code can be used to analyze and visualize alpha diversity, beta diversity, and taxa abundance for 16s sequencing of the gut microbiome. These data were collected in the [Vonder Haar lab](https://github.com/vonderhaarlab), and the full publication can be found [here](https://psycnet.apa.org/record/2022-85473-001).
 
-#In brief, the goal of the project was to determine the effects of traumatic brain injury (TBI) and a high-fat diet (HFD) on the gut microbiome across several collection timepoints. We found that TBI shifted the gut microbiome, and some acute changes were associated with behavioral outcomes.
+# In brief, the goal of the project was to determine the effects of traumatic brain injury (TBI) and a high-fat diet (HFD) on the gut microbiome across several collection timepoints. We found that TBI shifted the gut microbiome, and some acute changes were associated with behavioral outcomes.
 
 The code contained in the readme can be downloaded [here](https://github.com/mfrankz/BNE_Publication/blob/main/primary_code.R).
 Additional code, including plotting/analysis of the class/order level, plotting of PICRUSt data, and a model comparison approach where alpha and beta diversity were used to predict behavioral outcomes can be found [here](https://github.com/mfrankz/BNE_Publication/blob/main/additional_code.R).
